@@ -19,8 +19,52 @@ const serverlessConfiguration: AWS = {
       shouldStartNameWithService: true,
     },
     environment: {
+      REGION: "${self:provider.region}",
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
       NODE_OPTIONS: "--enable-source-maps --stack-trace-limit=1000",
+      TRANSACTIONS_TABLE: "${self:custom.transactionsTable}",
+    },
+    iam: {
+      role: {
+        statements: [
+          {
+            Effect: "Allow",
+            Action: [
+              "dynamodb:GetItem",
+              "dynamodb:PutItem",
+              "dynamodb:DeleteItem",
+              "dynamodb:UpdateItem",
+            ],
+            Resource: [{ "Fn::GetAtt": ["transactionsTable", "Arn"] }],
+          },
+        ],
+      },
+    },
+  },
+  resources: {
+    Resources: {
+      transactionsTable: {
+        Type: "AWS::DynamoDB::Table",
+        Properties: {
+          AttributeDefinitions: [
+            {
+              AttributeName: "id",
+              AttributeType: "S",
+            },
+          ],
+          KeySchema: [
+            {
+              AttributeName: "id",
+              KeyType: "HASH",
+            },
+          ],
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 5,
+            WriteCapacityUnits: 5,
+          },
+          TableName: "${self:custom.transactionsTable}",
+        },
+      },
     },
   },
   functions: {
@@ -35,9 +79,46 @@ const serverlessConfiguration: AWS = {
         },
       ],
     },
+
+    SaveTransaction: {
+      handler: "src/handlers/transactions/saveTransaction.main",
+      events: [
+        {
+          http: {
+            method: "post",
+            path: "transaction",
+          },
+        },
+      ],
+    },
+
+    GetTransaction: {
+      handler: "src/handlers/transactions/getTransaction.main",
+      events: [
+        {
+          http: {
+            method: "get",
+            path: "transaction/{id}",
+          },
+        },
+      ],
+    },
+
+    deleteTransaction: {
+      handler: "src/handlers/transactions/deleteTransaction.main",
+      events: [
+        {
+          http: {
+            method: "delete",
+            path: "transaction/{id}",
+          },
+        },
+      ],
+    },
   },
   package: { individually: true },
   custom: {
+    transactionsTable: "transactionsTable",
     esbuild: {
       bundle: true,
       minify: false,

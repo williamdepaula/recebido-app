@@ -5,14 +5,15 @@
   "main": "serverless.ts",
   "scripts": {
     "test": "jest",
-    "test:local": "jest --watch"
+    "test:local": "URL=http://localhost:3000/dev jest --watch"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "dependencies": {
     "@middy/core": "^2.5.3",
-    "@middy/http-json-body-parser": "^2.5.3"
+    "@middy/http-json-body-parser": "^2.5.3",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",
