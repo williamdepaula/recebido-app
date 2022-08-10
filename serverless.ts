@@ -86,7 +86,7 @@ const serverlessConfiguration: AWS = {
         {
           http: {
             method: "post",
-            path: "transaction",
+            path: "transactions",
           },
         },
       ],
@@ -98,7 +98,7 @@ const serverlessConfiguration: AWS = {
         {
           http: {
             method: "get",
-            path: "transaction/{id}",
+            path: "transactions/{id}",
           },
         },
       ],
@@ -110,7 +110,7 @@ const serverlessConfiguration: AWS = {
         {
           http: {
             method: "delete",
-            path: "transaction/{id}",
+            path: "transactions/{id}",
           },
         },
       ],

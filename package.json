@@ -5,7 +5,8 @@
   "main": "serverless.ts",
   "scripts": {
     "test": "jest",
-    "test:local": "URL=http://localhost:3000/dev jest --watch"
+    "test:local": "URL=http://localhost:3000/dev jest --watch",
+    "dev": "serverless offline start"
   },
   "engines": {
     "node": ">=14.15.0"

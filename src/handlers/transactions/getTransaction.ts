@@ -1,41 +1,18 @@
-const DynamoDB = require("aws-sdk/clients/dynamodb");
-
 import { formatJSONResponse } from "@libs/formatJSONResponse";
 import { middyfy } from "@libs/lambda";
 import { APIGatewayProxyResult } from "aws-lambda";
+import GetTransaction from "../../application/GetTransaction";
+import DynamoDBAdapter from "../../infra/database/DynamoDBAdapter";
+import TransactionDataBaseRepository from "../../infra/repository/TransactionDataBaseRepository";
 
 const getTransaction = middyfy(
   async (event): Promise<APIGatewayProxyResult> => {
     const { id } = event.pathParameters;
 
-    let dbOptions = {};
-    if (process.env.IS_OFFLINE) {
-      dbOptions = {
-        apiVersion: "2012-08-10",
-        region: "localhost",
-        endpoint: "http://localhost:8000",
-      };
-    } else {
-      dbOptions = {
-        apiVersion: "2012-08-10",
-        region: process.env.REGION,
-      };
-    }
-
-    const connection = new DynamoDB(dbOptions);
-    const TableName = process.env.TRANSACTIONS_TABLE;
-
-    var params = {
-      Key: {
-        id: {
-          S: `${id}`,
-        },
-      },
-      TableName,
-    };
-
-    let dataDB = await connection.getItem(params).promise();
-    let data = DynamoDB.Converter.unmarshall(dataDB["Item"]);
+    const connection = new DynamoDBAdapter();
+    const transactionRepository = new TransactionDataBaseRepository(connection);
+    const getTransaction = new GetTransaction(transactionRepository);
+    const data = await getTransaction.execute(id);
 
     return formatJSONResponse(data);
   }
