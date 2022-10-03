@@ -68,13 +68,13 @@ const serverlessConfiguration: AWS = {
     },
   },
   functions: {
-    hello: {
-      handler: "src/hello.main",
+    health: {
+      handler: "src/health.main",
       events: [
         {
           http: {
             method: "get",
-            path: "hello",
+            path: "health",
           },
         },
       ],
